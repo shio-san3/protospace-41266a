@@ -5,9 +5,12 @@ class CommentsController < ApplicationController
       redirect_to prototype_path(@comment.prototype)
     else
       @prototype = @comment.prototype
-      @comments = @prototype.comments
-      render "prototype/show"
-    end
+      @comments = @prototype.comments.includes(:user)
+      respond_to do |format|
+        format.html { render "prototypes/show" }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("form_container", partial: "prototypes/form", locals: { prototype: @prototype, comment: @comment }) }
+      end # respond_toブロックを終了
+    end # if/elseブロックを終了
   end
   
   private
